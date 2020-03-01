@@ -1,0 +1,317 @@
+{
+	"info": {
+		"_postman_id": "bd981d9d-535e-4bff-aa5a-bfc8ff23b2e7",
+		"name": "Azure Storage",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "01 GET Management OAuth2 token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "19380783-5fda-4801-811f-13957e8e58c5",
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"postman.setGlobalVariable(\"mgmt_access_token\", data.access_token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "{{client_id}}",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "{{client_secret}}",
+							"type": "text"
+						},
+						{
+							"key": "resource",
+							"value": "https://management.azure.com",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://login.microsoftonline.com/{{directoryId}}/oauth2/token",
+					"protocol": "https",
+					"host": [
+						"login",
+						"microsoftonline",
+						"com"
+					],
+					"path": [
+						"{{directoryId}}",
+						"oauth2",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "02 PUT create storage account",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{mgmt_access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"sku\": {\r\n    \"name\": \"Standard_GRS\"\r\n  },\r\n  \"kind\": \"StorageV2\",\r\n  \"location\": \"southcentralus\"\r\n}"
+				},
+				"url": {
+					"raw": "https://management.azure.com/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.Storage/storageAccounts/{{accountName}} ?api-version=2018-02-01",
+					"protocol": "https",
+					"host": [
+						"management",
+						"azure",
+						"com"
+					],
+					"path": [
+						"subscriptions",
+						"{{subscriptionId}}",
+						"resourceGroups",
+						"{{resourceGroupName}}",
+						"providers",
+						"Microsoft.Storage",
+						"storageAccounts",
+						"{{accountName}} "
+					],
+					"query": [
+						{
+							"key": "api-version",
+							"value": "2018-02-01"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "03 GET Storage OAuth2 token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "19380783-5fda-4801-811f-13957e8e58c5",
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"postman.setGlobalVariable(\"storage_access_token\", data.access_token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "{{client_id}}",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "{{client_secret}}",
+							"type": "text"
+						},
+						{
+							"key": "resource",
+							"value": "https://storage.azure.com",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://login.microsoftonline.com/{{directoryId}}/oauth2/token",
+					"protocol": "https",
+					"host": [
+						"login",
+						"microsoftonline",
+						"com"
+					],
+					"path": [
+						"{{directoryId}}",
+						"oauth2",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "04 PUT create container",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{storage_access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "x-ms-version",
+						"value": "2019-07-07",
+						"type": "text"
+					},
+					{
+						"key": "x-ms-blob-public-access",
+						"value": "container",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://{{accountName}}.blob.core.windows.net/{{containerName}}?restype=container ",
+					"protocol": "https",
+					"host": [
+						"{{accountName}}",
+						"blob",
+						"core",
+						"windows",
+						"net"
+					],
+					"path": [
+						"{{containerName}}"
+					],
+					"query": [
+						{
+							"key": "restype",
+							"value": "container "
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "05 PUT a blob in the container",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "a08ea20a-dab3-4a8a-b3f7-232c1ebcd058",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{storage_access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "x-ms-blob-type",
+						"type": "text",
+						"value": "BlockBlob"
+					},
+					{
+						"key": "x-ms-version",
+						"type": "text",
+						"value": "2019-07-07"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "hello world!"
+				},
+				"url": {
+					"raw": "https://{{accountName}}.blob.core.windows.net/{{containerName}}/{{blob_name}}",
+					"protocol": "https",
+					"host": [
+						"{{accountName}}",
+						"blob",
+						"core",
+						"windows",
+						"net"
+					],
+					"path": [
+						"{{containerName}}",
+						"{{blob_name}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
